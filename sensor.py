@@ -13,7 +13,7 @@ from homeassistant.const import (ATTR_ATTRIBUTION, CONF_MONITORED_CONDITIONS,
                                  TEMP_CELSIUS, UNIT_UV_INDEX)
 from homeassistant.helpers.entity import Entity, generate_entity_id
 
-REQUIREMENTS = ['pysmartweatherudp==0.1.3']
+REQUIREMENTS = ['pysmartweatherudp==0.1.4']
 
 __version__ = "0.1.0"
 
