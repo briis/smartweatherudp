@@ -1,0 +1,10 @@
+{
+   "smartweatherUDP" : {
+      "updated_at" : "2019-04-15",
+      "local_location" : "/custom_components/smartweatherudp/sensor.py",
+      "version" : "0.1.5",
+      "changelog" : "https://github.com/briis/smartweatherudp/blob/master/CHANGELOG.md",
+      "visit_repo" : "https://github.com/briis/smartweatherudp",
+      "remote_location" : "https://raw.githubusercontent.com/briis/smartweatherudp/master/sensor.py"
+   }
+}
