@@ -6,6 +6,10 @@ It will create several `sensor` entities for each weather reading like Temperatu
 
 The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.io/SmartWeather/api/udp/v105/) UDP API to retrieve current data for a local WeatherStation.
 
+**Notes:** 
+1. As this component listens for UDP broadcasts, in can take up to 1 minute before all sensors have gotten a value after restart of Home Assistant
+2. Precipiation values broadcasted from the unit is always current precipitation rate. That means that the value in the sensor *precipiation* is a calculated value. So if the system is restartet during the day, the value will be reset to 0. As long as the system is running this should be correct.
+
 ## Installation
 1. If you don't already have a `custom_components` directory in your config directory, create it, and then create a directory called `smartweatherudp`under that.
 2. Copy all the files from this repository in to the *smartweatherudp* folder. Remember to maintain the directory structure.
@@ -60,25 +64,25 @@ Default value: SmartWeather
 (list)(optional) Sensors to display in the frontend.<br>
 Default: All Sensors are displayed
 * **temperature** - Current temperature
+* **dewpoint** - Dewpoint. The atmospheric temperature (varying according to pressure and humidity) below which water droplets begin to condense and dew can form
 * **feels_like_temperature** - How the temperature Feels Like. A combination of Heat Index and Wind Chill
 * **heat_index** - A temperature measurement combining Humidity and temperature. How hot does it feel. Only used when temperature is above 26.67°C (80°F)
 * **wind_chill** - How cold does it feel. Only used if temperature is below 10°C (50°F)
-* **dewpoint** - Dewpoint. The atmospheric temperature (varying according to pressure and humidity) below which water droplets begin to condense and dew can form
-* **wind_speed** - Current Wind Speed
+* **wind_speed** - Average Wind Speed in the last minute
+* **wind_bearing** - Average Wind bearing in degrees for the last minute (Example: 287°)
+* **wind_speed_rapid** - Current Wind Speed (Updated every 3 seconds)
+* **wind_bearing_rapid** - Current Wind Bearing in degrees (Updated every 3 seconds)
 * **wind_gust** - Highest Wind Speed in the last minute
 * **wind_lull** - Lowest Wind Speed in the last minute
-* **wind_bearing** - Wind bearing in degrees (Example: 287°)
-* **wind_direction** - Wind bearing as directional text (Example: NNW)
+* **wind_direction** - Average Wind bearing as directional text for the last minute (Example: NNW)
 * **precipitation** - Precipitation since midnight
 * **precipitation_rate** - The current precipitation rate - 0 if it is not raining
-* **precipitation_last_1hr** - Precipitation in the last hour
-* **precipitation_last_24hr** - Precipitation in the last 24 hours.
-* **precipitation_yesterday** - Precipitation yesterday
 * **humidity** - Current humidity in %
 * **pressure** - Current barometric pressure, taking in to account the position of the station
 * **uv** - The UV index
 * **solar_radiation** - The current Solar Radiation measured in W/m2
 * **illuminance** - Shows the brightness in Lux
 * **lightning_count** - Shows the numbers of lightning strikes for last minute. Attributes of this sensor has more Lightning information.
-
+* **airbattery** - The current voltage of the attached AIR unit
+* **skybattery** - The current voltage of the attached SKY unit
 
