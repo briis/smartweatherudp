@@ -15,6 +15,8 @@ from homeassistant.helpers.entity import Entity, generate_entity_id
 
 REQUIREMENTS = ['pysmartweatherudp==0.1.3']
 
+__version__ = "0.1.0"
+
 DOMAIN = 'smartweatherudp'
 
 ATTRIBUTION = 'Powered by a Smart Homer Weather Station via UDP'
