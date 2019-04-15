@@ -13,7 +13,7 @@ from homeassistant.const import (ATTR_ATTRIBUTION, CONF_MONITORED_CONDITIONS,
                                  TEMP_CELSIUS, UNIT_UV_INDEX)
 from homeassistant.helpers.entity import Entity, generate_entity_id
 
-#REQUIREMENTS = ['pysmartweatherudp==0.1.3']
+REQUIREMENTS = ['pysmartweatherudp==0.1.3']
 
 DOMAIN = 'smartweatherudp'
 
@@ -62,8 +62,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the SmartWeather sensor platform."""
-#    from pysmartweatherudp import SWReceiver
-    from .pysmartweatherudp import SWReceiver
+    from pysmartweatherudp import SWReceiver
 
     unit_system = 'metric' if hass.config.units.is_metric else 'imperial'
 
