@@ -16,7 +16,7 @@ from homeassistant.helpers.entity import Entity, generate_entity_id
 
 REQUIREMENTS = ['pysmartweatherudp==0.1.5']
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 DOMAIN = 'smartweatherudp'
 
@@ -143,7 +143,35 @@ class SmartWeatherReceiver(Entity):
     @property
     def icon(self):
         """Icon to use in the frontend."""
-        return SENSOR_TYPES[self._sensor][2]
+        if 'Battery' in self._name:
+            if hasattr(self._data, self._sensor):
+                voltage = float(getattr(self._data, self._sensor))
+                if not (voltage is None):
+                    if voltage < 2.3:
+                        return 'mdi:battery-alert'
+                    elif voltage < 2.4:
+                        return 'mdi:battery-10'
+                    elif voltage < 2.5:
+                        return 'mdi:battery-20'
+                    elif voltage < 2.6:
+                        return 'mdi:battery-30'
+                    elif voltage < 2.7:
+                        return 'mdi:battery-40'
+                    elif voltage < 2.8:
+                        return 'mdi:battery-50'
+                    elif voltage < 2.9:
+                        return 'mdi:battery-60'
+                    elif voltage < 3.0:
+                        return 'mdi:battery-70'
+                    elif voltage < 3.1:
+                        return 'mdi:battery-80'
+                    elif voltage < 3.2:
+                        return 'mdi:battery-90'
+                    else:
+                        return 'mdi:battery'
+            return 'mdi:battery'
+        else:
+            return SENSOR_TYPES[self._sensor][2]
 
     @property
     def device_class(self):
