@@ -8,12 +8,12 @@ The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.i
 
 **Notes:** 
 1. As this component listens for UDP broadcasts, in can take up to 1 minute before all sensors have gotten a value after restart of Home Assistant
-2. Precipiation values broadcasted from the unit is always current precipitation rate. That means that the value in the sensor *precipiation* is a calculated value. So if the system is restartet during the day, the value will be reset to 0. As long as the system is running this should be correct.
+2. Precipitation values broadcasted from the unit is always current precipitation rate. That means that the value in the sensor *precipitation* is a calculated value. So if the system is restartet during the day, the value will be reset to 0. As long as the system is running this should be correct.
 3. My setup is 1 AIR unit and 1 SKY unit. This component is only designed to work with one of each unit. But I would be glad to know what happens if you have more than one of each unit connected to the same base.
 
 ## Installation
 1. If you don't already have a `custom_components` directory in your config directory, create it, and then create a directory called `smartweatherudp`under that.
-2. Copy all the files from this repository in to the *smartweatherudp* folder. Remember to maintain the directory structure.
+2. Copy `__init__.py` and `sensor.py` from this repository in to the *smartweatherudp* folder. Remember to maintain the directory structure.
 3. or using Git, go to the `custom_components` directory and enter:<br>
 `git clone https://github.com/briis/smartweatherudp.git`
 
@@ -55,6 +55,8 @@ sensor:
       - solar_radiation
       - illuminance
       - lightning_count
+      - airbattery
+      - skybattery
 ```
 #### Configuration Variables
 **name**<br>
