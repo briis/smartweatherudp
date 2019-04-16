@@ -61,7 +61,7 @@ sensor:
 ```
 #### Configuration Variables
 **wind_unit**<br>
-(string)(optional) If Home Assistant Unit System is *metric* specify `kmh` to get units in km/h. Else this has no effect.
+(string)(optional) If Home Assistant Unit System is *metric*, specify `kmh` to get units in km/h. Else this has no effect.<br>
 Default Value: m/s if Home Assistant Unit System is *metric*, and mph if Unit System is *imperial*
 
 **name**<br>
