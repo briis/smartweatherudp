@@ -10,16 +10,19 @@ from homeassistant.const import (ATTR_ATTRIBUTION, CONF_MONITORED_CONDITIONS,
                                  DEVICE_CLASS_ILLUMINANCE,
                                  DEVICE_CLASS_PRESSURE,
                                  DEVICE_CLASS_TEMPERATURE,
+                                 DEVICE_CLASS_BATTERY,
                                  TEMP_CELSIUS, UNIT_UV_INDEX)
 from homeassistant.helpers.entity import Entity, generate_entity_id
 
-REQUIREMENTS = ['pysmartweatherudp==0.1.4']
+REQUIREMENTS = ['pysmartweatherudp==0.1.5']
 
 __version__ = "0.1.0"
 
 DOMAIN = 'smartweatherudp'
 
 ATTRIBUTION = 'Powered by a Smart Homer Weather Station via UDP'
+
+CONF_WIND_UNIT = 'wind_unit'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,13 +55,14 @@ SENSOR_TYPES = {
     'solar_radiation': ['Solar Radiation', 'W/m2', 'mdi:solar-power', None, None],
     'illuminance': ['Illuminance', 'Lx', 'mdi:brightness-5', DEVICE_CLASS_ILLUMINANCE, None],
     'lightning_count': ['Lightning Count', None, 'mdi:flash', None, None],
-    'airbattery': ['AIR Battery', 'V', 'mdi:battery', None, None],
-    'skybattery': ['SKY Battery', 'V', 'mdi:battery', None, None]
+    'airbattery': ['AIR Battery', 'V', 'mdi:battery', DEVICE_CLASS_BATTERY, None],
+    'skybattery': ['SKY Battery', 'V', 'mdi:battery', DEVICE_CLASS_BATTERY, None]
 }
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MONITORED_CONDITIONS, default=list(SENSOR_TYPES)):
         vol.All(cv.ensure_list, [vol.In(SENSOR_TYPES)]),
+    vol.Optional(CONF_WIND_UNIT, default='ms'): cv.string,
     vol.Optional(CONF_NAME, default=DOMAIN): cv.string
 })
 
@@ -72,20 +76,23 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     module.start()
 
     name = config.get(CONF_NAME)
+    wind_unit = config.get(CONF_WIND_UNIT)
 
     sensors = []
     for variable in config[CONF_MONITORED_CONDITIONS]:
-        sensors.append(SmartWeatherReceiver(hass, module, variable, name, unit_system))
+        sensors.append(SmartWeatherReceiver(hass, module, variable, name, unit_system, wind_unit))
         _LOGGER.debug("Sensor added: %s", variable)
 
     add_entities(sensors, True)
 
 class SmartWeatherReceiver(Entity):
 
-    def __init__(self, hass, module, sensor, name, unit_system):
+    def __init__(self, hass, module, sensor, name, unit_system, wind_unit):
         """Initialize the sensor."""
         self._sensor = sensor
         self._unit_system = unit_system
+        self._wind_unit = wind_unit
+
         self._name = SENSOR_TYPES[self._sensor][0]
         self.entity_id = generate_entity_id(ENTITY_ID_FORMAT, '{} {}'.format(name, SENSOR_TYPES[self._sensor][0]), hass=hass)
 
@@ -112,15 +119,26 @@ class SmartWeatherReceiver(Entity):
         if hasattr(self._data, self._sensor):
             variable = getattr(self._data, self._sensor)
             if not (variable is None):
-                return variable
+                if SENSOR_TYPES[self._sensor][1] == 'm/s':
+                    return round(variable*3.6,1) \
+                        if self._wind_unit == 'kmh' \
+                        else variable
+                else:
+                    return variable
         return None
 
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return SENSOR_TYPES[self._sensor][4] \
-            if self._unit_system == 'imperial' and not (SENSOR_TYPES[self._sensor][4] is None) \
-            else SENSOR_TYPES[self._sensor][1]
+        if self._unit_system == 'imperial' and not (SENSOR_TYPES[self._sensor][4] is None):
+            return SENSOR_TYPES[self._sensor][4]
+        else:
+            if SENSOR_TYPES[self._sensor][1] == 'm/s':
+                return 'km/h' \
+                    if self._wind_unit == 'kmh' \
+                    else SENSOR_TYPES[self._sensor][1]
+            else:
+                return SENSOR_TYPES[self._sensor][1]
 
     @property
     def icon(self):
