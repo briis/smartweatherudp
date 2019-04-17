@@ -36,20 +36,19 @@ sensor:
     wind_unit: kmh
     monitored_conditions:
       - temperature
+      - dewpoint
       - feels_like_temperature
       - heat_index
       - wind_chill
-      - dewpoint
       - wind_speed
+      - wind_bearing
+      - wind_speed_rapid
+      - wind_bearing_rapid
       - wind_gust
       - wind_lull
-      - wind_bearing
       - wind_direction
       - precipitation
       - precipitation_rate
-      - precipitation_last_1hr
-      - precipitation_last_24hr
-      - precipitation_yesterday
       - humidity
       - pressure
       - uv
