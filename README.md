@@ -37,7 +37,7 @@ sensor:
     monitored_conditions:
       - temperature
       - dewpoint
-      - feels_like_temperature
+      - feels_like
       - heat_index
       - wind_chill
       - wind_speed
