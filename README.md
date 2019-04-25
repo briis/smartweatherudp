@@ -13,7 +13,7 @@ The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.i
 
 ## Installation
 1. If you don't already have a `custom_components` directory in your config directory, create it, and then create a directory called `smartweatherudp`under that.
-2. Copy `__init__.py` and `sensor.py` from this repository in to the *smartweatherudp* folder. Remember to maintain the directory structure.
+2. Copy `__init__.py`, `manifest.json` and `sensor.py` from this repository in to the *smartweatherudp* folder. Remember to maintain the directory structure.
 3. or using Git, go to the `custom_components` directory and enter:<br>
 `git clone https://github.com/briis/smartweatherudp.git`
 
