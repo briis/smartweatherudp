@@ -14,7 +14,7 @@ from homeassistant.const import (ATTR_ATTRIBUTION, CONF_MONITORED_CONDITIONS,
                                  TEMP_CELSIUS, UNIT_UV_INDEX)
 from homeassistant.helpers.entity import Entity, generate_entity_id
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 DOMAIN = 'smartweatherudp'
 
