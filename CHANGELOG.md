@@ -1,6 +1,6 @@
 # List of Changes
 
-### Version 0.1.2
+### Version 0.1.3
 * Added `manifest.json` to ensure compliance with Home Assistant >= 0.92.x. If Custom Updater is not the latest version, this file needs to be downloaded manually before upgrading
 
 ### Version 0.1.1
