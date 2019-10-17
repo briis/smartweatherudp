@@ -13,6 +13,7 @@ The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.i
 
 ## Installation
 This Integration can be installed in two ways:
+
 **HACS Installation**<br>
 Add the following to the Custom Repository under `Settings` in HACS:<br>
 `briis/smartweatherudp` and choose `Ìntegration` as Category
