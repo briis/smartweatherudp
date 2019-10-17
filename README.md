@@ -12,13 +12,19 @@ The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.i
 3. My setup is 1 AIR unit and 1 SKY unit. This component is only designed to work with one of each unit. But I would be glad to know what happens if you have more than one of each unit connected to the same base.
 
 ## Installation
+This Integration can be installed in two ways:
+**HACS Installation**<br>
+Add the following to the Custom Repository under `Settings` in HACS:<br>
+`briis/smartweatherudp` and choose `Ìntegration` as Category
+
+**Manuel Installation**<br>
 1. If you don't already have a `custom_components` directory in your config directory, create it, and then create a directory called `smartweatherudp`under that.
-2. Copy `__init__.py`, `manifest.json` and `sensor.py` from this repository in to the *smartweatherudp* folder. Remember to maintain the directory structure.
+2. Copy `__init__.py`, `manifest.json` and `sensor.py` from this repository in to the *smartweatherudp* folder. 
 3. or using Git, go to the `custom_components` directory and enter:<br>
 `git clone https://github.com/briis/smartweatherudp.git`
 
 ## Track Updates
-This custom component can be tracked with the help of the [Custom Updater](https://github.com/custom-components/custom_updater) component.
+If installed via HACS, updates are flagged automatically. If you did a manual installation this custom component can be tracked with the help of the [Custom Updater](https://github.com/custom-components/custom_updater) component.
 
 In your configuration.yaml file add the following:
 ```yaml
@@ -28,7 +34,7 @@ component_urls:
 ```
 
 ## Configuration
-Edit your *configuration.yaml* file and add the *smartweather sensor* component to the file:
+Edit your *configuration.yaml* file and add the *smartweather sensor* component to the file:<br>
 **Note** If you don't add `monitored_conditions` then all sensors will be created.
 
 ```yaml
