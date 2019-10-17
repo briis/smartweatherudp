@@ -6,7 +6,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, PLATFORM_SCHEMA
 from homeassistant.const import (ATTR_ATTRIBUTION, CONF_MONITORED_CONDITIONS,
-                                 CONF_NAME, DEVICE_CLASS_HUMIDITY,
+                                 CONF_NAME, DEVICE_CLASS_HUMIDITY, CONF_HOST,
                                  DEVICE_CLASS_ILLUMINANCE,
                                  DEVICE_CLASS_PRESSURE,
                                  DEVICE_CLASS_TEMPERATURE,
@@ -22,7 +22,6 @@ CONF_WIND_UNIT = 'wind_unit'
 
 _LOGGER = logging.getLogger(__name__)
 
-DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 50222
 
 ATTR_LAST_UPDATE = 'last_update'
@@ -59,6 +58,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MONITORED_CONDITIONS, default=list(SENSOR_TYPES)):
         vol.All(cv.ensure_list, [vol.In(SENSOR_TYPES)]),
     vol.Optional(CONF_WIND_UNIT, default='ms'): cv.string,
+    vol.Optional(CONF_HOST, default='0.0.0.0'): cv.string,
     vol.Optional(CONF_NAME, default=DOMAIN): cv.string
 })
 
@@ -68,7 +68,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     unit_system = 'metric' if hass.config.units.is_metric else 'imperial'
 
-    module = SWReceiver(DEFAULT_HOST, DEFAULT_PORT, unit_system)
+    module = SWReceiver(CONF_HOST, DEFAULT_PORT, unit_system)
     module.start()
 
     name = config.get(CONF_NAME)
