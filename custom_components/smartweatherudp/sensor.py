@@ -68,7 +68,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     unit_system = 'metric' if hass.config.units.is_metric else 'imperial'
 
-    module = SWReceiver(CONF_HOST, DEFAULT_PORT, unit_system)
+    module = SWReceiver(config.get(CONF_HOST), DEFAULT_PORT, unit_system)
     module.start()
 
     name = config.get(CONF_NAME)
