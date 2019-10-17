@@ -7,7 +7,7 @@ It will create several `sensor` entities for each weather reading like Temperatu
 The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.io/SmartWeather/api/udp/v105/) UDP API to retrieve current data for a local WeatherStation.
 
 ## Configuration
-Edit your *configuration.yaml* file and add the *smartweather sensor* component to the file:
+Edit your *configuration.yaml* file and add the *smartweather sensor* component to the file:<br>
 **Note** If you don't add `monitored_conditions` then all sensors will be created.
 
 ```yaml
