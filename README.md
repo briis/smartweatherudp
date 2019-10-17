@@ -29,10 +29,13 @@ component_urls:
 
 ## Configuration
 Edit your *configuration.yaml* file and add the *smartweather sensor* component to the file:
+**Note** If you don't add `monitored_conditions` then all sensors will be created.
+
 ```yaml
 # Example configuration.yaml entry
 sensor:
   - platform: smartweatherudp
+    host: 0.0.0.0
     wind_unit: kmh
     monitored_conditions:
       - temperature
@@ -62,6 +65,9 @@ sensor:
 **wind_unit**<br>
 (string)(optional) If Home Assistant Unit System is *metric*, specify `kmh` to get units in km/h. Else this has no effect.<br>
 Default Value: m/s if Home Assistant Unit System is *metric*, and mph if Unit System is *imperial*
+
+**host**<br>
+(string)(optional) Default is `0.0.0.0` but you can enter any host IP. Typically used if your Weather Station is on a different Subnet than Home Assistant.
 
 **name**<br>
 (string)(Optional) Additional name for the sensors.<br>
