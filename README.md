@@ -4,7 +4,7 @@
 ![WeatherFlow Logo](https://github.com/briis/hass-SmartWeather/blob/master/images/weatherflow.png)<br>
 This a *custom component* for [Home Assistant](https://www.home-assistant.io/). It reads real-time data using the UDP protocol from a Smart Weather weather station produced by *WeatherFlow*.
 
-**V0.1.7 - Now has support for the Tempest Weather System!**<br>
+**v0.1.7 - Now has support for the Tempest Weather System!**<br>
 The Tempest Weather System combines the functionality of the AIR and SKY units into a single device. 
 
 It will create several `sensor` entities for each weather reading like Temperature, Precipitation, Rain etc. 
@@ -23,7 +23,7 @@ This Integration can be installed in two ways:
 Add the following to the Custom Repository under `Settings` in HACS:<br>
 `briis/smartweatherudp` and choose `Ìntegration` as Category
 
-**Manuel Installation**<br>
+**Manual Installation**<br>
 1. If you don't already have a `custom_components` directory in your config directory, create it, and then create a directory called `smartweatherudp`under that.
 2. Copy `__init__.py`, `manifest.json` and `sensor.py` from this repository in to the *smartweatherudp* folder. 
 3. or using Git, go to the `custom_components` directory and enter:<br>
