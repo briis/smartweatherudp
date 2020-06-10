@@ -4,6 +4,9 @@
 ![WeatherFlow Logo](https://github.com/briis/hass-SmartWeather/blob/master/images/weatherflow.png)<br>
 This a *custom component* for [Home Assistant](https://www.home-assistant.io/). It reads real-time data using the UDP protocol from a Smart Weather weather station produced by *WeatherFlow*.
 
+**V0.1.7 - Now has support for the Tempest Weather System!**<br>
+The Tempest Weather System combines the functionality of the AIR and SKY units into a single device. 
+
 It will create several `sensor` entities for each weather reading like Temperature, Precipitation, Rain etc. 
 
 The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.io/SmartWeather/api/udp/v105/) UDP API to retrieve current data for a local WeatherStation.
@@ -105,6 +108,8 @@ Default: All Sensors are displayed
 * **solar_radiation** - The current Solar Radiation measured in W/m2
 * **illuminance** - Shows the brightness in Lux
 * **lightning_count** - Shows the numbers of lightning strikes for last minute. Attributes of this sensor has more Lightning information.
-* **airbattery** - The current voltage of the attached AIR unit
+* **airbattery** - The current voltage of the attached AIR unit 
 * **skybattery** - The current voltage of the attached SKY unit
+
+NOTE:  The Tempest Weather System will return its battery voltage in BOTH the airbattery and skybattery sensors
 

@@ -1,5 +1,8 @@
 # List of Changes
 
+### Version 0.1.7
+* Added support for the Tempest Weather System
+
 ### Version 0.1.3
 * Added `manifest.json` to ensure compliance with Home Assistant >= 0.92.x. 
 * Changed the Custom Updater setup, to ensure that it works with multiple files going forward. You will need to re-download `sensor.py`, `__init__.py` and `manifest.json` 
