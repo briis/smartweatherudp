@@ -3,7 +3,7 @@ This a *custom component* for [Home Assistant](https://www.home-assistant.io/). 
 
 It will create several `sensor` entities for each weather reading like Temperature, Precipitation, Rain etc. 
 
-The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.io/SmartWeather/api/udp/v105/) UDP API to retrieve current data for a local WeatherStation.
+The `smartweather` component uses the [WeatherFlow](https://weatherflow.github.io/SmartWeather/api/udp/v119/) UDP API to retrieve current data for a local WeatherStation.
 
 ## Configuration
 Edit your *configuration.yaml* file and add the *smartweather sensor* component to the file:<br>

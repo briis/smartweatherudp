@@ -1,3 +1,3 @@
 """ Get data from Smart Weather station via UDP. """
 
-__version__ = "0.1.5"
+__version__ = "0.1.7"
