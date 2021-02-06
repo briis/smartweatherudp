@@ -4,6 +4,8 @@
 ![WeatherFlow Logo](https://github.com/briis/hass-SmartWeather/blob/master/images/weatherflow.png)<br>
 This a *custom component* for [Home Assistant](https://www.home-assistant.io/). It reads real-time data using the UDP protocol from a Smart Weather weather station produced by *WeatherFlow*.
 
+## As I don't have access to HW on my location, this Integration is no longer maintained by me. @LuckyJay has volunteered to fix bugs, as time allows. If any one else wants to volunteer, please send me a note.
+
 **v0.1.7 - Now has support for the Tempest Weather System!**<br>
 The Tempest Weather System combines the functionality of the AIR and SKY units into a single device. 
 
