@@ -4,5 +4,6 @@
     "documentation": "https://github.com/briis/smartweatherudp",
     "dependencies": [],
     "codeowners": ["@briis"],
-    "requirements": ["pysmartweatherudp==0.1.7"]
+    "requirements": ["pysmartweatherudp==0.1.7"],
+    "version": "0.1.7"
 }
