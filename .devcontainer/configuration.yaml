@@ -1,0 +1,8 @@
+default_config:
+
+stream:
+
+logger:
+  default: error
+  logs:
+    custom_components.smartweatherudp: debug
