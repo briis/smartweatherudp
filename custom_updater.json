@@ -1,8 +1,8 @@
 {
     "smartweatherUDP": {
-        "updated_at": "2019-04-29",
+        "updated_at": "2021-07-03",
         "local_location": "/custom_components/smartweatherudp/__init__.py",
-        "version": "0.1.7",
+        "version": "0.1.8",
         "changelog": "https://github.com/briis/smartweatherudp/blob/master/CHANGELOG.md",
         "visit_repo": "https://github.com/briis/smartweatherudp",
         "remote_location": "https://raw.githubusercontent.com/briis/smartweatherudp/master/__init__.py",
