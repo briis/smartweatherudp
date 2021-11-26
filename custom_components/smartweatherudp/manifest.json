@@ -3,6 +3,7 @@
     "name": "WeatherFlow Smart Weather Component for Home Assistant using UDP Transport",
     "documentation": "https://github.com/briis/smartweatherudp",
     "dependencies": [],
+    "version": "0.1.8",
     "codeowners": ["@briis"],
     "requirements": ["pysmartweatherudp==0.1.7"]
 }
