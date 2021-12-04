@@ -5,11 +5,6 @@
         "data": {
           "host": "Host"
         }
-      },
-      "manual": {
-        "data": {
-          "host": "Host"
-        }
       }
     },
     "error": {

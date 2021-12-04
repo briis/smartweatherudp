@@ -5,11 +5,6 @@
         "data": {
           "host": "[%key:common::config_flow::data::host%]"
         }
-      },
-      "manual": {
-        "data": {
-          "host": "[%key:common::config_flow::data::host%]"
-        }
       }
     },
     "error": {
