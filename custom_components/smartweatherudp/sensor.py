@@ -7,7 +7,7 @@ import logging
 from typing import Any
 
 from pyweatherflowudp.calc import Quantity
-from pyweatherflowudp.const import EVENT_RAIN_START, EVENT_RAPID_WIND, EVENT_STRIKE
+from pyweatherflowudp.const import EVENT_RAPID_WIND, UNIT_MINUTES
 from pyweatherflowudp.device import (
     EVENT_OBSERVATION,
     EVENT_STATUS_UPDATE,
@@ -19,6 +19,7 @@ from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     PLATFORM_SCHEMA,
     STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL,
     SensorEntity,
     SensorEntityDescription,
 )
@@ -42,8 +43,10 @@ from homeassistant.const import (
     IRRADIATION_WATTS_PER_SQUARE_METER,
     LENGTH_KILOMETERS,
     LENGTH_MILES,
+    LENGTH_MILLIMETERS,
     LIGHT_LUX,
     PERCENTAGE,
+    PRECIPITATION_INCHES,
     PRECIPITATION_INCHES_PER_HOUR,
     PRECIPITATION_MILLIMETERS_PER_HOUR,
     PRESSURE_INHG,
@@ -75,6 +78,7 @@ QUANTITY_INCHES_PER_HOUR = "in/hr"
 IMPERIAL_UNIT_MAP = {
     CONCENTRATION_KILOGRAMS_PER_CUBIC_METER: CONCENTRATION_POUNDS_PER_CUBIC_FOOT,
     LENGTH_KILOMETERS: LENGTH_MILES,
+    LENGTH_MILLIMETERS: PRECIPITATION_INCHES,
     PRECIPITATION_MILLIMETERS_PER_HOUR: PRECIPITATION_INCHES_PER_HOUR,
     PRESSURE_MBAR: PRESSURE_INHG,
     SPEED_KILOMETERS_PER_HOUR: SPEED_MILES_PER_HOUR,
@@ -192,6 +196,7 @@ async def async_setup_platform(
 class WeatherFlowSensorEntityDescription(SensorEntityDescription):
     """Describes WeatherFlow sensor entity description."""
 
+    attr: str | None = None
     conversion_fn: Callable[[Quantity], datetime | StateType] | None = None
     decimals: int | None = None
     event_subscriptions: list[str] = field(default_factory=lambda: [EVENT_OBSERVATION])
@@ -275,10 +280,22 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         icon="mdi:lightning-bolt",
     ),
     WeatherFlowSensorEntityDescription(
-        key="rain_amount_previous_minute",
+        key="rain_amount",
+        name="Rain Amount",
+        icon="mdi:weather-rainy",
+        native_unit_of_measurement=LENGTH_MILLIMETERS,
+        state_class=STATE_CLASS_TOTAL,
+        attr="rain_amount_previous_minute",
+        conversion_fn=lambda attr: (attr * UNIT_MINUTES).to(PRECIPITATION_INCHES),
+        decimals=2,
+        value_fn=lambda attr: (attr * UNIT_MINUTES).to(LENGTH_MILLIMETERS),
+    ),
+    WeatherFlowSensorEntityDescription(
+        key="rain_rate",
         name="Rain Rate",
         icon="mdi:weather-rainy",
         native_unit_of_measurement=PRECIPITATION_MILLIMETERS_PER_HOUR,
+        attr="rain_amount_previous_minute",
         conversion_fn=lambda attr: attr.to(QUANTITY_INCHES_PER_HOUR),
         decimals=2,
         value_fn=lambda attr: attr.to(QUANTITY_MILLIMETERS_PER_HOUR),
@@ -388,7 +405,12 @@ async def async_setup_entry(
         async_add_entities(
             WeatherFlowSensorEntity(device, description, hass.config.units.is_metric)
             for description in SENSORS
-            if getattr(device, description.key, None) is not None
+            if getattr(
+                device,
+                description.key if description.attr is None else description.attr,
+                None,
+            )
+            is not None
         )
 
     config_entry.async_on_unload(
@@ -443,9 +465,21 @@ class WeatherFlowSensorEntity(WeatherFlowEntity):
         self.unsubscribes = []
 
     @property
+    def last_reset(self) -> datetime | None:
+        """Return the time when the sensor was last reset, if any."""
+        if self.entity_description.state_class == STATE_CLASS_TOTAL:
+            return self.device.last_report
+        return None
+
+    @property
     def native_value(self) -> datetime | StateType:
         """Return the state of the sensor."""
-        attr = getattr(self.device, self.entity_description.key)
+        attr = getattr(
+            self.device,
+            self.entity_description.key
+            if self.entity_description.attr is None
+            else self.entity_description.attr,
+        )
 
         if (
             not self.hass.config.units.is_metric
