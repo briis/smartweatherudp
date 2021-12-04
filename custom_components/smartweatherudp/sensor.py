@@ -40,6 +40,8 @@ from homeassistant.const import (
     ELECTRIC_POTENTIAL_VOLT,
     ENTITY_CATEGORY_DIAGNOSTIC,
     IRRADIATION_WATTS_PER_SQUARE_METER,
+    LENGTH_KILOMETERS,
+    LENGTH_MILES,
     LIGHT_LUX,
     PERCENTAGE,
     PRECIPITATION_INCHES_PER_HOUR,
@@ -72,6 +74,7 @@ QUANTITY_INCHES_PER_HOUR = "in/hr"
 
 IMPERIAL_UNIT_MAP = {
     CONCENTRATION_KILOGRAMS_PER_CUBIC_METER: CONCENTRATION_POUNDS_PER_CUBIC_FOOT,
+    LENGTH_KILOMETERS: LENGTH_MILES,
     PRECIPITATION_MILLIMETERS_PER_HOUR: PRECIPITATION_INCHES_PER_HOUR,
     PRESSURE_MBAR: PRESSURE_INHG,
     SPEED_KILOMETERS_PER_HOUR: SPEED_MILES_PER_HOUR,
@@ -259,6 +262,19 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         state_class=STATE_CLASS_MEASUREMENT,
     ),
     WeatherFlowSensorEntityDescription(
+        key="lightning_strike_average_distance",
+        name="Lightning Average Distance",
+        icon="mdi:lightning-bolt"
+        native_unit_of_measurement=LENGTH_KILOMETERS,
+        conversion_fn=lambda attr: attr.to(LENGTH_MILES),
+        decimals=2,
+    ),
+    WeatherFlowSensorEntityDescription(
+        key="lightning_strike_count",
+        name="Lightning Count",
+        icon="mdi:lightning-bolt"
+    ),
+    WeatherFlowSensorEntityDescription(
         key="rain_amount_previous_minute",
         name="Rain Rate",
         icon="mdi:weather-rainy",
@@ -282,6 +298,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         state_class=STATE_CLASS_MEASUREMENT,
         entity_registry_enabled_default=False,
+        event_subscriptions=[EVENT_STATUS_UPDATE],
     ),
     WeatherFlowSensorEntityDescription(
         key="station_pressure",
@@ -305,6 +322,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         device_class=DEVICE_CLASS_TIMESTAMP,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         entity_registry_enabled_default=False,
+        event_subscriptions=[EVENT_STATUS_UPDATE],
     ),
     WeatherFlowSensorEntityDescription(
         key="uv",
@@ -382,7 +400,7 @@ async def async_setup_entry(
     )
 
 
-class WeatherFlowEntity:
+class WeatherFlowEntity(SensorEntity):
     """WeatherFlow entity base class."""
 
     def __init__(self, device: WeatherFlowDevice) -> None:
@@ -398,7 +416,7 @@ class WeatherFlowEntity:
         )
 
 
-class WeatherFlowSensorEntity(WeatherFlowEntity, SensorEntity):
+class WeatherFlowSensorEntity(WeatherFlowEntity):
     """Defines a WeatherFlow sensor entity."""
 
     entity_description: WeatherFlowSensorEntityDescription
