@@ -1,13 +1,18 @@
 """Sensors for the smartweatherudp integration."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 import logging
 from typing import Any
 
 from pyweatherflowudp.calc import Quantity
-from pyweatherflowudp.device import WeatherFlowDevice
+from pyweatherflowudp.const import EVENT_RAIN_START, EVENT_RAPID_WIND, EVENT_STRIKE
+from pyweatherflowudp.device import (
+    EVENT_OBSERVATION,
+    EVENT_STATUS_UPDATE,
+    WeatherFlowDevice,
+)
 import voluptuous as vol
 
 from homeassistant.components.sensor import (
@@ -186,6 +191,7 @@ class WeatherFlowSensorEntityDescription(SensorEntityDescription):
 
     conversion_fn: Callable[[Quantity], datetime | StateType] | None = None
     decimals: int | None = None
+    event_subscriptions: list[str] = field(default_factory=lambda: [EVENT_OBSERVATION])
     value_fn: Callable[[Quantity], datetime | StateType] | None = None
 
 
@@ -346,6 +352,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
     WeatherFlowWindSensorEntityDescription(
         key="wind_speed",
         name="Wind Speed",
+        event_subscriptions=[EVENT_RAPID_WIND, EVENT_OBSERVATION],
     ),
 )
 
@@ -414,6 +421,8 @@ class WeatherFlowSensorEntity(WeatherFlowEntity, SensorEntity):
             f"{self.device.model} {self.device.serial_number} {description.name}"
         )
         self._attr_unique_id = f"{DOMAIN}_{self.device.serial_number}_{description.key}"
+        self._attr_should_poll = False
+        self.unsubscribes = []
 
     @property
     def native_value(self) -> datetime | StateType:
@@ -430,3 +439,15 @@ class WeatherFlowSensorEntity(WeatherFlowEntity, SensorEntity):
         if (decimals := self.entity_description.decimals) is not None:
             value = round(value, decimals)
         return value
+
+    async def async_added_to_hass(self) -> None:
+        """Subscribe to events."""
+        self.unsubscribes = [
+            self.device.on(event, lambda _: self.schedule_update_ha_state())
+            for event in self.entity_description.event_subscriptions
+        ]
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Unsubscribe from events."""
+        for unsub in self.unsubscribes:
+            unsub()
