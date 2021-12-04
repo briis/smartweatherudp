@@ -264,7 +264,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
     WeatherFlowSensorEntityDescription(
         key="lightning_strike_average_distance",
         name="Lightning Average Distance",
-        icon="mdi:lightning-bolt"
+        icon="mdi:lightning-bolt",
         native_unit_of_measurement=LENGTH_KILOMETERS,
         conversion_fn=lambda attr: attr.to(LENGTH_MILES),
         decimals=2,
@@ -272,7 +272,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
     WeatherFlowSensorEntityDescription(
         key="lightning_strike_count",
         name="Lightning Count",
-        icon="mdi:lightning-bolt"
+        icon="mdi:lightning-bolt",
     ),
     WeatherFlowSensorEntityDescription(
         key="rain_amount_previous_minute",
