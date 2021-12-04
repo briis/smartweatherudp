@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host"
+        }
+      }
+    },
+    "error": {
+      "address_in_use": "The host address is already in use. Please specify a different host address below.",
+      "cannot_connect": "Failed to connect"
+    },
+    "abort": {
+      "single_instance_allowed": "Already configured. Only a single configuration possible.",
+      "no_devices_found": "No devices found on the network"
+    }
+  }
+}

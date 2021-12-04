@@ -1,3 +1,77 @@
 """ Get data from Smart Weather station via UDP. """
+from __future__ import annotations
 
-__version__ = "0.1.8"
+import logging
+
+from pyweatherflowudp.client import EVENT_DEVICE_DISCOVERED, WeatherFlowListener
+from pyweatherflowudp.const import DEFAULT_HOST
+from pyweatherflowudp.device import EVENT_LOAD_COMPLETE, WeatherFlowDevice
+from pyweatherflowudp.errors import ListenerError
+
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_STOP
+from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.dispatcher import async_dispatcher_send
+
+from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
+
+PLATFORMS = [SENSOR_DOMAIN]
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up WeatherFlow from a config entry."""
+    hass.data.setdefault(DOMAIN, {})
+
+    client = hass.data[DOMAIN][entry.entry_id] = WeatherFlowListener(
+        host=entry.data.get(CONF_HOST, DEFAULT_HOST)
+    )
+
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+
+    @callback
+    def device_discovered(device: WeatherFlowDevice) -> None:
+        _LOGGER.debug("Found a device: %s", device)
+        entry.async_on_unload(
+            device.on(
+                EVENT_LOAD_COMPLETE,
+                lambda _: async_dispatcher_send(
+                    hass, f"{DOMAIN}_{entry.entry_id}_add_{SENSOR_DOMAIN}", device
+                ),
+            )
+        )
+
+    entry.async_on_unload(
+        client.on(EVENT_DEVICE_DISCOVERED, lambda device: device_discovered(device))
+    )
+
+    try:
+        await client.start_listening()
+    except ListenerError as ex:
+        raise ConfigEntryNotReady from ex
+
+    async def handle_ha_shutdown(event: Event) -> None:
+        """Handle HA shutdown."""
+        await client.stop_listening()
+
+    entry.async_on_unload(
+        hass.bus.async_listen(EVENT_HOMEASSISTANT_STOP, handle_ha_shutdown)
+    )
+
+    return True
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+    client: WeatherFlowListener = hass.data[DOMAIN][entry.entry_id]
+    await client.stop_listening()
+
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
+
+    return unload_ok

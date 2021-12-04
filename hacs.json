@@ -1,4 +1,6 @@
 {
-  "name": "WeatherFlow Smart Weather UDP Sensor for Home Assistant",
-  "domains": ["sensor"]
+  "name": "WeatherFlow - Local",
+  "domains": [
+    "sensor"
+  ]
 }

@@ -1,9 +1,14 @@
 {
     "domain": "smartweatherudp",
-    "name": "WeatherFlow Smart Weather Component for Home Assistant using UDP Transport",
+    "name": "WeatherFlow - Local",
+    "config_flow": true,
     "documentation": "https://github.com/briis/smartweatherudp",
-    "dependencies": [],
-    "version": "0.1.8",
-    "codeowners": ["@briis"],
-    "requirements": ["pysmartweatherudp==0.1.7"]
+    "version": "2021.12.0",
+    "codeowners": [
+        "@briis",
+        "@natekspencer"
+    ],
+    "requirements": [
+        "pyweatherflowudp==1.0.1"
+    ]
 }
