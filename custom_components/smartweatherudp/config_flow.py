@@ -55,7 +55,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle a flow initialized by the user."""
         current_hosts = [
-            entry.data.get(CONF_HOST) for entry in self._async_current_entries()
+            entry.data.get(CONF_HOST, DEFAULT_HOST)
+            for entry in self._async_current_entries()
         ]
 
         if user_input is None:
@@ -82,7 +83,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ListenerError:
                 errors["base"] = "cannot_connect"
 
-            if errors or user_input is None:
+            if errors or (not has_devices and user_input is None):
                 return self.async_show_form(
                     step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
                 )
@@ -96,7 +97,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_create_entry(
             title=f"WeatherFlow{f' ({host})' if host != DEFAULT_HOST else ''}",
-            data=user_input,
+            data=user_input or {},
         )
 
     async def async_step_import(self, config: dict[str, Any] | None) -> FlowResult:
