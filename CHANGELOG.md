@@ -1,5 +1,9 @@
 # List of Changes
 
+## Version 2021.12.1
+
+- Round temperature values to one decimal
+
 ## Version 2021.12.0
 
 ### Breaking Changes
