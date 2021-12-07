@@ -85,86 +85,39 @@ IMPERIAL_UNIT_MAP = {
 }
 
 # Deprecated configuration.yaml
-CONF_WIND_UNIT = "wind_unit"
-SENSOR_TYPES = {
-    "temperature": [
-        "Temperature",
-        TEMP_CELSIUS,
-        "mdi:thermometer",
-        DEVICE_CLASS_TEMPERATURE,
-        None,
-    ],
-    "dewpoint": [
-        "Dewpoint",
-        TEMP_CELSIUS,
-        "mdi:thermometer",
-        DEVICE_CLASS_TEMPERATURE,
-        None,
-    ],
-    "feels_like": [
-        "Feels Like",
-        TEMP_CELSIUS,
-        "mdi:thermometer",
-        DEVICE_CLASS_TEMPERATURE,
-        None,
-    ],
-    "heat_index": [
-        "Heat Index",
-        TEMP_CELSIUS,
-        "mdi:thermometer",
-        DEVICE_CLASS_TEMPERATURE,
-        None,
-    ],
-    "wind_chill": [
-        "Wind Chill",
-        TEMP_CELSIUS,
-        "mdi:thermometer",
-        DEVICE_CLASS_TEMPERATURE,
-        None,
-    ],
-    "wind_speed": ["Wind Speed", "m/s", "mdi:weather-windy", None, "mph"],
-    "wind_bearing": ["Wind Bearing", "°", "mdi:compass-outline", None, None],
-    "wind_speed_rapid": [
-        "Wind Speed Realtime",
-        "m/s",
-        "mdi:weather-windy",
-        None,
-        "mph",
-    ],
-    "wind_bearing_rapid": [
-        "Wind Bearing Realtime",
-        "°",
-        "mdi:compass-outline",
-        None,
-        None,
-    ],
-    "wind_gust": ["Wind Gust", "m/s", "mdi:weather-windy", None, "mph"],
-    "wind_lull": ["Wind Lull", "m/s", "mdi:weather-windy", None, "mph"],
-    "wind_direction": ["Wind Direction", None, "mdi:compass-outline", None, None],
-    "precipitation": ["Rain today", "mm", "mdi:weather-rainy", None, "in"],
-    "precipitation_rate": ["Rain rate", "mm/h", "mdi:weather-pouring", None, "in/h"],
-    "humidity": ["Humidity", "%", "mdi:water-percent", DEVICE_CLASS_HUMIDITY, None],
-    "pressure": ["Pressure", "hPa", "mdi:gauge", DEVICE_CLASS_PRESSURE, "inHg"],
-    "uv": ["UV", UV_INDEX, "mdi:weather-sunny", None, None],
-    "solar_radiation": ["Solar Radiation", "W/m2", "mdi:solar-power", None, None],
-    "illuminance": [
-        "Illuminance",
-        "Lx",
-        "mdi:brightness-5",
-        DEVICE_CLASS_ILLUMINANCE,
-        None,
-    ],
-    "lightning_count": ["Lightning Count", None, "mdi:flash", None, None],
-    "airbattery": ["AIR Battery", "V", "mdi:battery", DEVICE_CLASS_BATTERY, None],
-    "skybattery": ["SKY Battery", "V", "mdi:battery", DEVICE_CLASS_BATTERY, None],
-}
+DEPRECATED_CONF_WIND_UNIT = "wind_unit"
+DEPRECATED_SENSOR_TYPES = [
+    "temperature",
+    "dewpoint",
+    "feels_like",
+    "heat_index",
+    "wind_chill",
+    "wind_speed",
+    "wind_bearing",
+    "wind_speed_rapid",
+    "wind_bearing_rapid",
+    "wind_gust",
+    "wind_lull",
+    "wind_direction",
+    "precipitation",
+    "precipitation_rate",
+    "humidity",
+    "pressure",
+    "uv",
+    "solar_radiation",
+    "illuminance",
+    "lightning_count",
+    "airbattery",
+    "skybattery",
+]
+
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_MONITORED_CONDITIONS, default=list(SENSOR_TYPES)): vol.All(
-            cv.ensure_list, [vol.In(SENSOR_TYPES)]
-        ),
-        vol.Optional(CONF_WIND_UNIT, default="ms"): cv.string,
+        vol.Required(
+            CONF_MONITORED_CONDITIONS, default=DEPRECATED_SENSOR_TYPES
+        ): vol.All(cv.ensure_list, [vol.In(DEPRECATED_SENSOR_TYPES)]),
+        vol.Optional(DEPRECATED_CONF_WIND_UNIT, default="ms"): cv.string,
         vol.Optional(CONF_HOST, default="0.0.0.0"): cv.string,
         vol.Optional(CONF_NAME, default=DOMAIN): cv.string,
     }
@@ -194,7 +147,7 @@ async def async_setup_platform(
 
 @dataclass
 class WeatherFlowSensorEntityDescription(SensorEntityDescription):
-    """Describes WeatherFlow sensor entity description."""
+    """Describes a WeatherFlow sensor entity description."""
 
     attr: str | None = None
     conversion_fn: Callable[[Quantity], datetime | StateType] | None = None
@@ -204,8 +157,21 @@ class WeatherFlowSensorEntityDescription(SensorEntityDescription):
 
 
 @dataclass
+class WeatherFlowTemperatureSensorEntityDescription(WeatherFlowSensorEntityDescription):
+    """Describes a WeatherFlow temperature sensor entity description."""
+
+    def __post_init__(self) -> None:
+        """Post initialisation processing."""
+        self.native_unit_of_measurement = TEMP_CELSIUS
+        self.device_class = DEVICE_CLASS_TEMPERATURE
+        self.state_class = STATE_CLASS_MEASUREMENT
+        self.decimals = 1
+        super().__post_init__()
+
+
+@dataclass
 class WeatherFlowWindSensorEntityDescription(WeatherFlowSensorEntityDescription):
-    """Describes WeatherFlow wind sensor entity description."""
+    """Describes a WeatherFlow wind sensor entity description."""
 
     def __post_init__(self) -> None:
         """Post initialisation processing."""
@@ -219,12 +185,9 @@ class WeatherFlowWindSensorEntityDescription(WeatherFlowSensorEntityDescription)
 
 
 SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
-    WeatherFlowSensorEntityDescription(
+    WeatherFlowTemperatureSensorEntityDescription(
         key="air_temperature",
         name="Temperature",
-        native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
     ),
     WeatherFlowSensorEntityDescription(
         key="air_density",
@@ -235,13 +198,9 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         conversion_fn=lambda attr: attr.to(CONCENTRATION_POUNDS_PER_CUBIC_FOOT),
         decimals=5,
     ),
-    WeatherFlowSensorEntityDescription(
+    WeatherFlowTemperatureSensorEntityDescription(
         key="dew_point_temperature",
         name="Dew Point",
-        native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
-        decimals=2,
     ),
     WeatherFlowSensorEntityDescription(
         key="battery",
@@ -251,13 +210,9 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
-    WeatherFlowSensorEntityDescription(
+    WeatherFlowTemperatureSensorEntityDescription(
         key="feels_like_temperature",
         name="Feels Like",
-        native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
-        decimals=2,
     ),
     WeatherFlowSensorEntityDescription(
         key="illuminance",
@@ -357,13 +312,9 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         conversion_fn=lambda attr: attr.to(PRESSURE_INHG),
         decimals=5,
     ),
-    WeatherFlowSensorEntityDescription(
+    WeatherFlowTemperatureSensorEntityDescription(
         key="wet_bulb_temperature",
         name="Wet Bulb Temperature",
-        native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
-        decimals=2,
     ),
     WeatherFlowWindSensorEntityDescription(
         key="wind_average",
