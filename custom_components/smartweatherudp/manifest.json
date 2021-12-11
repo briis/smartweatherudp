@@ -9,6 +9,6 @@
         "@natekspencer"
     ],
     "requirements": [
-        "pyweatherflowudp==1.0.1"
+        "pyweatherflowudp==1.1.1"
     ]
 }
