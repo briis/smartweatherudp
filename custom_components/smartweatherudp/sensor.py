@@ -7,7 +7,7 @@ import logging
 from typing import Any
 
 from pyweatherflowudp.calc import Quantity
-from pyweatherflowudp.const import EVENT_RAPID_WIND, UNIT_MINUTES
+from pyweatherflowudp.const import EVENT_RAPID_WIND
 from pyweatherflowudp.device import (
     EVENT_OBSERVATION,
     EVENT_STATUS_UPDATE,
@@ -29,7 +29,6 @@ from homeassistant.const import (
     CONF_MONITORED_CONDITIONS,
     CONF_NAME,
     DEGREE,
-    DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_ILLUMINANCE,
     DEVICE_CLASS_PRESSURE,
@@ -349,6 +348,7 @@ async def async_setup_entry(
     @callback
     def async_add_sensor(device: WeatherFlowDevice) -> None:
         """Add WeatherFlow sensor."""
+        _LOGGER.debug("Adding sensors for %s", device)
         async_add_entities(
             WeatherFlowSensorEntity(device, description, hass.config.units.is_metric)
             for description in SENSORS
@@ -369,26 +369,11 @@ async def async_setup_entry(
     )
 
 
-class WeatherFlowEntity(SensorEntity):
-    """WeatherFlow entity base class."""
-
-    def __init__(self, device: WeatherFlowDevice) -> None:
-        """Initialize a WeatherFlow entity."""
-        self.device = device
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.device.serial_number)},
-            manufacturer="WeatherFlow",
-            model=self.device.model,
-            name=f"{self.device.model} {self.device.serial_number}",
-            sw_version=self.device.firmware_revision,
-            suggested_area="Backyard",
-        )
-
-
-class WeatherFlowSensorEntity(WeatherFlowEntity):
+class WeatherFlowSensorEntity(SensorEntity):
     """Defines a WeatherFlow sensor entity."""
 
     entity_description: WeatherFlowSensorEntityDescription
+    _attr_should_poll = False
 
     def __init__(
         self,
@@ -397,18 +382,25 @@ class WeatherFlowSensorEntity(WeatherFlowEntity):
         is_metric: bool = True,
     ) -> None:
         """Initialize a WeatherFlow sensor entity."""
-        super().__init__(device=device)
+        self.device = device
         if not is_metric and (
             (unit := IMPERIAL_UNIT_MAP.get(description.native_unit_of_measurement))
             is not None
         ):
             description.native_unit_of_measurement = unit
         self.entity_description = description
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, self.device.serial_number)},
+            manufacturer="WeatherFlow",
+            model=self.device.model,
+            name=f"{self.device.model} {self.device.serial_number}",
+            sw_version=self.device.firmware_revision,
+            suggested_area="Backyard",
+        )
         self._attr_name = (
             f"{self.device.model} {self.device.serial_number} {description.name}"
         )
         self._attr_unique_id = f"{DOMAIN}_{self.device.serial_number}_{description.key}"
-        self._attr_should_poll = False
         self.unsubscribes = []
 
     @property
