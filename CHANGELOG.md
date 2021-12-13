@@ -1,5 +1,13 @@
 # List of Changes
 
+## Version 2021.12.3
+
+- Add an additional debug log when setting up sensors
+
+## Version 2021.12.2
+
+- Bump pyweatherflowudp to 1.1.1 to better handle future firmware revisions
+
 ## Version 2021.12.1
 
 - Round temperature values to one decimal
