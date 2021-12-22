@@ -352,12 +352,10 @@ async def async_setup_entry(
         async_add_entities(
             WeatherFlowSensorEntity(device, description, hass.config.units.is_metric)
             for description in SENSORS
-            if getattr(
+            if hasattr(
                 device,
                 description.key if description.attr is None else description.attr,
-                None,
             )
-            is not None
         )
 
     config_entry.async_on_unload(
@@ -420,16 +418,19 @@ class WeatherFlowSensorEntity(SensorEntity):
             else self.entity_description.attr,
         )
 
+        if attr is None:
+            return attr
+
         if (
             not self.hass.config.units.is_metric
             and (fn := self.entity_description.conversion_fn) is not None
         ) or (fn := self.entity_description.value_fn) is not None:
             attr = fn(attr)
 
-        value = attr.m if isinstance(attr, Quantity) else attr
+        attr = attr.m if isinstance(attr, Quantity) else attr
         if (decimals := self.entity_description.decimals) is not None:
-            value = round(value, decimals)
-        return value
+            attr = round(attr, decimals)
+        return attr
 
     async def async_added_to_hass(self) -> None:
         """Subscribe to events."""

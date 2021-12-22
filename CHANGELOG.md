@@ -1,5 +1,9 @@
 # List of Changes
 
+## Version 2021.12.5
+
+- Bump pyweatherflowudp to 1.2.0 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
+
 ## Version 2021.12.4
 
 - Bump pyweatherflowudp to 1.1.2 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)

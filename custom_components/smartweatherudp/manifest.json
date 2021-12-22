@@ -3,12 +3,12 @@
     "name": "WeatherFlow - Local",
     "config_flow": true,
     "documentation": "https://github.com/briis/smartweatherudp",
-    "version": "2021.12.4",
+    "version": "2021.12.5",
     "codeowners": [
         "@briis",
         "@natekspencer"
     ],
     "requirements": [
-        "pyweatherflowudp==1.1.2"
+        "pyweatherflowudp==1.2.0"
     ]
 }
