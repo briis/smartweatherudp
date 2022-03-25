@@ -1,0 +1,10 @@
+{
+  "state": {
+    "_": {
+      "NONE": "None",
+      "RAIN": "Rain",
+      "HAIL": "Hail",
+      "RAIN_HAIL": "Rain, hail"
+    }
+  }
+}

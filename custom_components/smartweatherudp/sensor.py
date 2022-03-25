@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 import logging
 from typing import Any
 
@@ -18,10 +19,10 @@ import voluptuous as vol
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     PLATFORM_SCHEMA,
-    STATE_CLASS_MEASUREMENT,
-    STATE_CLASS_TOTAL,
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
+    SensorStateClass,
 )
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
@@ -29,14 +30,6 @@ from homeassistant.const import (
     CONF_MONITORED_CONDITIONS,
     CONF_NAME,
     DEGREE,
-    DEVICE_CLASS_HUMIDITY,
-    DEVICE_CLASS_ILLUMINANCE,
-    DEVICE_CLASS_PRESSURE,
-    DEVICE_CLASS_SIGNAL_STRENGTH,
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_TIMESTAMP,
-    DEVICE_CLASS_VOLATILE_ORGANIC_COMPOUNDS,
-    DEVICE_CLASS_VOLTAGE,
     ELECTRIC_POTENTIAL_VOLT,
     ENTITY_CATEGORY_DIAGNOSTIC,
     IRRADIATION_WATTS_PER_SQUARE_METER,
@@ -162,8 +155,8 @@ class WeatherFlowTemperatureSensorEntityDescription(WeatherFlowSensorEntityDescr
     def __post_init__(self) -> None:
         """Post initialisation processing."""
         self.native_unit_of_measurement = TEMP_CELSIUS
-        self.device_class = DEVICE_CLASS_TEMPERATURE
-        self.state_class = STATE_CLASS_MEASUREMENT
+        self.device_class = SensorDeviceClass.TEMPERATURE
+        self.state_class = SensorStateClass.MEASUREMENT
         self.decimals = 1
         super().__post_init__()
 
@@ -176,7 +169,7 @@ class WeatherFlowWindSensorEntityDescription(WeatherFlowSensorEntityDescription)
         """Post initialisation processing."""
         self.icon = "mdi:weather-windy"
         self.native_unit_of_measurement = SPEED_KILOMETERS_PER_HOUR
-        self.state_class = STATE_CLASS_MEASUREMENT
+        self.state_class = SensorStateClass.MEASUREMENT
         self.conversion_fn = lambda attr: attr.to(SPEED_MILES_PER_HOUR)
         self.decimals = 2
         self.value_fn = lambda attr: attr.to(QUANTITY_KILOMETERS_PER_HOUR)
@@ -192,8 +185,8 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="air_density",
         name="Air Density",
         native_unit_of_measurement=CONCENTRATION_KILOGRAMS_PER_CUBIC_METER,
-        device_class=DEVICE_CLASS_VOLATILE_ORGANIC_COMPOUNDS,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
+        state_class=SensorStateClass.MEASUREMENT,
         conversion_fn=lambda attr: attr.to(CONCENTRATION_POUNDS_PER_CUBIC_FOOT),
         decimals=5,
     ),
@@ -205,9 +198,9 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="battery",
         name="Battery Voltage",
         native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
-        device_class=DEVICE_CLASS_VOLTAGE,
+        device_class=SensorDeviceClass.VOLTAGE,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-        state_class=STATE_CLASS_MEASUREMENT,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowTemperatureSensorEntityDescription(
         key="feels_like_temperature",
@@ -217,8 +210,8 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="illuminance",
         name="Illuminance",
         native_unit_of_measurement=LIGHT_LUX,
-        device_class=DEVICE_CLASS_ILLUMINANCE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.ILLUMINANCE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowSensorEntityDescription(
         key="lightning_strike_average_distance",
@@ -234,11 +227,16 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         icon="mdi:lightning-bolt",
     ),
     WeatherFlowSensorEntityDescription(
+        key="precipitation_type",
+        name="Precipitation Type",
+        icon="mdi:weather-rainy",
+    ),
+    WeatherFlowSensorEntityDescription(
         key="rain_amount",
         name="Rain Amount",
         icon="mdi:weather-rainy",
         native_unit_of_measurement=LENGTH_MILLIMETERS,
-        state_class=STATE_CLASS_TOTAL,
+        state_class=SensorStateClass.TOTAL,
         attr="rain_accumulation_previous_minute",
         conversion_fn=lambda attr: attr.to(PRECIPITATION_INCHES),
     ),
@@ -254,16 +252,16 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="relative_humidity",
         name="Humidity",
         native_unit_of_measurement=PERCENTAGE,
-        device_class=DEVICE_CLASS_HUMIDITY,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowSensorEntityDescription(
         key="rssi",
         name="RSSI",
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-        device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-        state_class=STATE_CLASS_MEASUREMENT,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         event_subscriptions=[EVENT_STATUS_UPDATE],
     ),
@@ -271,8 +269,8 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="station_pressure",
         name="Station Pressure",
         native_unit_of_measurement=PRESSURE_MBAR,
-        device_class=DEVICE_CLASS_PRESSURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
         conversion_fn=lambda attr: attr.to(PRESSURE_INHG),
         decimals=5,
     ),
@@ -280,13 +278,13 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="solar_radiation",
         name="Solar Radiation",
         native_unit_of_measurement=IRRADIATION_WATTS_PER_SQUARE_METER,
-        device_class=DEVICE_CLASS_ILLUMINANCE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.ILLUMINANCE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowSensorEntityDescription(
         key="up_since",
         name="Up Since",
-        device_class=DEVICE_CLASS_TIMESTAMP,
+        device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         entity_registry_enabled_default=False,
         event_subscriptions=[EVENT_STATUS_UPDATE],
@@ -295,15 +293,15 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="uv",
         name="UV",
         native_unit_of_measurement=UV_INDEX,
-        device_class=DEVICE_CLASS_ILLUMINANCE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.ILLUMINANCE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowSensorEntityDescription(
         key="vapor_pressure",
         name="Vapor Pressure",
         native_unit_of_measurement=PRESSURE_MBAR,
-        device_class=DEVICE_CLASS_PRESSURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
         conversion_fn=lambda attr: attr.to(PRESSURE_INHG),
         decimals=5,
     ),
@@ -320,7 +318,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         name="Wind Direction",
         icon="mdi:compass-outline",
         native_unit_of_measurement=DEGREE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowWindSensorEntityDescription(
         key="wind_gust",
@@ -404,7 +402,7 @@ class WeatherFlowSensorEntity(SensorEntity):
     @property
     def last_reset(self) -> datetime | None:
         """Return the time when the sensor was last reset, if any."""
-        if self.entity_description.state_class == STATE_CLASS_TOTAL:
+        if self.entity_description.state_class == SensorStateClass.TOTAL:
             return self.device.last_report
         return None
 
@@ -427,7 +425,11 @@ class WeatherFlowSensorEntity(SensorEntity):
         ) or (fn := self.entity_description.value_fn) is not None:
             attr = fn(attr)
 
-        attr = attr.m if isinstance(attr, Quantity) else attr
+        if isinstance(attr, Quantity):
+            attr = attr.m
+        elif isinstance(attr, Enum):
+            attr = attr.name
+
         if (decimals := self.entity_description.decimals) is not None:
             attr = round(attr, decimals)
         return attr
