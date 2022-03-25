@@ -1,5 +1,12 @@
 # List of Changes
 
+## Version 2022.3.0
+
+- Bump pyweatherflowudp to 1.3.0 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
+- Add sensor for precipitation type with english translation file
+- Update sensors to use SensorDeviceClass and SensorStateClass enums
+- Update minimum HA version to 2021.12
+
 ## Version 2021.12.5
 
 - Bump pyweatherflowudp to 1.2.0 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
