@@ -31,7 +31,6 @@ from homeassistant.const import (
     CONF_NAME,
     DEGREE,
     ELECTRIC_POTENTIAL_VOLT,
-    ENTITY_CATEGORY_DIAGNOSTIC,
     IRRADIATION_WATTS_PER_SQUARE_METER,
     LENGTH_KILOMETERS,
     LENGTH_MILES,
@@ -52,7 +51,7 @@ from homeassistant.const import (
 from homeassistant.core import Callable, HomeAssistant, callback
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, StateType
 
@@ -158,7 +157,6 @@ class WeatherFlowTemperatureSensorEntityDescription(WeatherFlowSensorEntityDescr
         self.device_class = SensorDeviceClass.TEMPERATURE
         self.state_class = SensorStateClass.MEASUREMENT
         self.decimals = 1
-        super().__post_init__()
 
 
 @dataclass
@@ -173,7 +171,6 @@ class WeatherFlowWindSensorEntityDescription(WeatherFlowSensorEntityDescription)
         self.conversion_fn = lambda attr: attr.to(SPEED_MILES_PER_HOUR)
         self.decimals = 2
         self.value_fn = lambda attr: attr.to(QUANTITY_KILOMETERS_PER_HOUR)
-        super().__post_init__()
 
 
 SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
@@ -199,7 +196,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         name="Battery Voltage",
         native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowTemperatureSensorEntityDescription(
@@ -260,7 +257,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         name="RSSI",
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         event_subscriptions=[EVENT_STATUS_UPDATE],
@@ -285,7 +282,7 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="up_since",
         name="Up Since",
         device_class=SensorDeviceClass.TIMESTAMP,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         event_subscriptions=[EVENT_STATUS_UPDATE],
     ),
