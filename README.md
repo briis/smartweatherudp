@@ -1,8 +1,11 @@
+![Release](https://img.shields.io/github/v/release/briis/smartweatherudp?style=for-the-badge)
+[![Buy Me A Coffee/Beer](https://img.shields.io/badge/Buy_Me_A_☕/🍺-F16061?style=for-the-badge&logo=ko-fi&logoColor=white&labelColor=grey)](https://ko-fi.com/natekspencer)
+[![HACS Badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+[![Discord Server](https://img.shields.io/discord/918948431714738257?style=for-the-badge)](https://discord.gg/rWzPjQegRy)
+
 ![WeatherFlow Logo](logo.png)
 
 # WeatherFlow Local for Home Assistant
-
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs) [![](https://img.shields.io/discord/918948431714738257)](https://discord.gg/rWzPjQegRy)
 
 This a _custom component_ for [Home Assistant](https://www.home-assistant.io/). It reads real-time data using the [UDP protocol](https://weatherflow.github.io/Tempest/api/udp/v171/) from a _WeatherFlow_ weather station.
 

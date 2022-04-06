@@ -1,5 +1,10 @@
 # List of Changes
 
+## Version 2022.4.0
+
+- Update sensors to use EntityCategory enums
+- Update minimum HA version to 2022.3
+
 ## Version 2022.3.0
 
 - Bump pyweatherflowudp to 1.3.0 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
