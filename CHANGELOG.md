@@ -1,5 +1,9 @@
 # List of Changes
 
+## Version 2022.5.0
+
+- Ensure HA has started before attempting to add devices
+
 ## Version 2022.4.0
 
 - Update sensors to use EntityCategory enums
