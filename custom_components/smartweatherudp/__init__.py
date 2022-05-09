@@ -10,8 +10,12 @@ from pyweatherflowudp.errors import ListenerError
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.const import (
+    CONF_HOST,
+    EVENT_HOMEASSISTANT_STARTED,
+    EVENT_HOMEASSISTANT_STOP,
+)
+from homeassistant.core import CoreState, Event, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
@@ -35,18 +39,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     @callback
     def device_discovered(device: WeatherFlowDevice) -> None:
         _LOGGER.debug("Found a device: %s", device)
+
+        @callback
+        def add_device() -> None:
+            async_dispatcher_send(
+                hass, f"{DOMAIN}_{entry.entry_id}_add_{SENSOR_DOMAIN}", device
+            )
+
         entry.async_on_unload(
             device.on(
                 EVENT_LOAD_COMPLETE,
-                lambda _: async_dispatcher_send(
-                    hass, f"{DOMAIN}_{entry.entry_id}_add_{SENSOR_DOMAIN}", device
+                lambda _: add_device()
+                if hass.state == CoreState.running
+                else hass.bus.async_listen_once(
+                    EVENT_HOMEASSISTANT_STARTED, lambda _: add_device()
                 ),
             )
         )
 
-    entry.async_on_unload(
-        client.on(EVENT_DEVICE_DISCOVERED, lambda device: device_discovered(device))
-    )
+    entry.async_on_unload(client.on(EVENT_DEVICE_DISCOVERED, device_discovered))
 
     try:
         await client.start_listening()
