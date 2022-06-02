@@ -1,5 +1,9 @@
 # List of Changes
 
+## Version 2022.6.0
+
+- Bump pyweatherflowudp to 1.3.1 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
+
 ## Version 2022.5.0
 
 - Ensure HA has started before attempting to add devices
