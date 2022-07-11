@@ -63,8 +63,7 @@ CONCENTRATION_KILOGRAMS_PER_CUBIC_METER = "kg/m³"
 CONCENTRATION_POUNDS_PER_CUBIC_FOOT = "lbs/ft³"
 
 QUANTITY_KILOMETERS_PER_HOUR = "kph"
-QUANTITY_MILLIMETERS_PER_HOUR = "mm/hr"
-QUANTITY_INCHES_PER_HOUR = "in/hr"
+QUANTITY_INCHES_PER_HOUR = "in/h"
 
 IMPERIAL_UNIT_MAP = {
     CONCENTRATION_KILOGRAMS_PER_CUBIC_METER: CONCENTRATION_POUNDS_PER_CUBIC_FOOT,
@@ -141,10 +140,10 @@ class WeatherFlowSensorEntityDescription(SensorEntityDescription):
     """Describes a WeatherFlow sensor entity description."""
 
     attr: str | None = None
-    conversion_fn: Callable[[Quantity], datetime | StateType] | None = None
+    conversion_fn: Callable[[Quantity], Quantity] | None = None
     decimals: int | None = None
     event_subscriptions: list[str] = field(default_factory=lambda: [EVENT_OBSERVATION])
-    value_fn: Callable[[Quantity], datetime | StateType] | None = None
+    value_fn: Callable[[Quantity], Quantity] | None = None
 
 
 @dataclass
@@ -316,6 +315,14 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         icon="mdi:compass-outline",
         native_unit_of_measurement=DEGREE,
         state_class=SensorStateClass.MEASUREMENT,
+        event_subscriptions=[EVENT_RAPID_WIND, EVENT_OBSERVATION],
+    ),
+    WeatherFlowSensorEntityDescription(
+        key="wind_direction_average",
+        name="Wind Direction Average",
+        icon="mdi:compass-outline",
+        native_unit_of_measurement=DEGREE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     WeatherFlowWindSensorEntityDescription(
         key="wind_gust",
@@ -394,7 +401,6 @@ class WeatherFlowSensorEntity(SensorEntity):
             f"{self.device.model} {self.device.serial_number} {description.name}"
         )
         self._attr_unique_id = f"{DOMAIN}_{self.device.serial_number}_{description.key}"
-        self.unsubscribes = []
 
     @property
     def last_reset(self) -> datetime | None:
@@ -433,12 +439,7 @@ class WeatherFlowSensorEntity(SensorEntity):
 
     async def async_added_to_hass(self) -> None:
         """Subscribe to events."""
-        self.unsubscribes = [
-            self.device.on(event, lambda _: self.schedule_update_ha_state())
-            for event in self.entity_description.event_subscriptions
-        ]
-
-    async def async_will_remove_from_hass(self) -> None:
-        """Unsubscribe from events."""
-        for unsub in self.unsubscribes:
-            unsub()
+        for event in self.entity_description.event_subscriptions:
+            self.async_on_remove(
+                self.device.on(event, lambda _: self.async_write_ha_state())
+            )

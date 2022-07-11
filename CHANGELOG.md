@@ -1,5 +1,11 @@
 # List of Changes
 
+## Version 2022.7.0
+
+- Bump pyweatherflowudp to 1.4.1 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
+- Add `wind direction average` sensor
+  - The previous `wind direction` sensor will now update based on the rapid wind speed event and align with the `wind speed` sensor
+
 ## Version 2022.6.0
 
 - Bump pyweatherflowudp to 1.3.1 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
