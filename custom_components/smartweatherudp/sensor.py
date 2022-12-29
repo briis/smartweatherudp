@@ -13,6 +13,7 @@ from pyweatherflowudp.device import (
     EVENT_OBSERVATION,
     EVENT_STATUS_UPDATE,
     WeatherFlowDevice,
+    WeatherFlowSensorDevice,
 )
 import voluptuous as vol
 
@@ -32,21 +33,16 @@ from homeassistant.const import (
     DEGREE,
     ELECTRIC_POTENTIAL_VOLT,
     IRRADIATION_WATTS_PER_SQUARE_METER,
-    LENGTH_KILOMETERS,
-    LENGTH_MILES,
-    LENGTH_MILLIMETERS,
     LIGHT_LUX,
     PERCENTAGE,
-    PRECIPITATION_INCHES,
-    PRECIPITATION_INCHES_PER_HOUR,
-    PRECIPITATION_MILLIMETERS_PER_HOUR,
-    PRESSURE_INHG,
-    PRESSURE_MBAR,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-    SPEED_KILOMETERS_PER_HOUR,
-    SPEED_MILES_PER_HOUR,
-    TEMP_CELSIUS,
     UV_INDEX,
+    UnitOfLength,
+    UnitOfPrecipitationDepth,
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfTemperature,
+    UnitOfVolumetricFlux,
 )
 from homeassistant.core import Callable, HomeAssistant, callback
 import homeassistant.helpers.config_validation as cv
@@ -54,6 +50,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, StateType
+from homeassistant.util.unit_system import METRIC_SYSTEM
 
 from .const import DOMAIN
 
@@ -63,15 +60,14 @@ CONCENTRATION_KILOGRAMS_PER_CUBIC_METER = "kg/m³"
 CONCENTRATION_POUNDS_PER_CUBIC_FOOT = "lbs/ft³"
 
 QUANTITY_KILOMETERS_PER_HOUR = "kph"
-QUANTITY_INCHES_PER_HOUR = "in/h"
 
 IMPERIAL_UNIT_MAP = {
     CONCENTRATION_KILOGRAMS_PER_CUBIC_METER: CONCENTRATION_POUNDS_PER_CUBIC_FOOT,
-    LENGTH_KILOMETERS: LENGTH_MILES,
-    LENGTH_MILLIMETERS: PRECIPITATION_INCHES,
-    PRECIPITATION_MILLIMETERS_PER_HOUR: PRECIPITATION_INCHES_PER_HOUR,
-    PRESSURE_MBAR: PRESSURE_INHG,
-    SPEED_KILOMETERS_PER_HOUR: SPEED_MILES_PER_HOUR,
+    UnitOfLength.KILOMETERS: UnitOfLength.MILES,
+    UnitOfPrecipitationDepth.MILLIMETERS: UnitOfPrecipitationDepth.INCHES,
+    UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR: UnitOfVolumetricFlux.INCHES_PER_HOUR,
+    UnitOfPressure.MBAR: UnitOfPressure.INHG,
+    UnitOfSpeed.KILOMETERS_PER_HOUR: UnitOfSpeed.MILES_PER_HOUR,
 }
 
 # Deprecated configuration.yaml
@@ -152,7 +148,7 @@ class WeatherFlowTemperatureSensorEntityDescription(WeatherFlowSensorEntityDescr
 
     def __post_init__(self) -> None:
         """Post initialisation processing."""
-        self.native_unit_of_measurement = TEMP_CELSIUS
+        self.native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self.device_class = SensorDeviceClass.TEMPERATURE
         self.state_class = SensorStateClass.MEASUREMENT
         self.decimals = 1
@@ -165,9 +161,9 @@ class WeatherFlowWindSensorEntityDescription(WeatherFlowSensorEntityDescription)
     def __post_init__(self) -> None:
         """Post initialisation processing."""
         self.icon = "mdi:weather-windy"
-        self.native_unit_of_measurement = SPEED_KILOMETERS_PER_HOUR
+        self.native_unit_of_measurement = UnitOfSpeed.KILOMETERS_PER_HOUR
         self.state_class = SensorStateClass.MEASUREMENT
-        self.conversion_fn = lambda attr: attr.to(SPEED_MILES_PER_HOUR)
+        self.conversion_fn = lambda attr: attr.to(UnitOfSpeed.MILES_PER_HOUR)
         self.decimals = 2
         self.value_fn = lambda attr: attr.to(QUANTITY_KILOMETERS_PER_HOUR)
 
@@ -213,8 +209,8 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="lightning_strike_average_distance",
         name="Lightning Average Distance",
         icon="mdi:lightning-bolt",
-        native_unit_of_measurement=LENGTH_KILOMETERS,
-        conversion_fn=lambda attr: attr.to(LENGTH_MILES),
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        conversion_fn=lambda attr: attr.to(UnitOfLength.MILES),
         decimals=2,
     ),
     WeatherFlowSensorEntityDescription(
@@ -231,18 +227,18 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
         key="rain_amount",
         name="Rain Amount",
         icon="mdi:weather-rainy",
-        native_unit_of_measurement=LENGTH_MILLIMETERS,
+        native_unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
         state_class=SensorStateClass.TOTAL,
         attr="rain_accumulation_previous_minute",
-        conversion_fn=lambda attr: attr.to(PRECIPITATION_INCHES),
+        conversion_fn=lambda attr: attr.to(UnitOfPrecipitationDepth.INCHES),
     ),
     WeatherFlowSensorEntityDescription(
         key="rain_rate",
         name="Rain Rate",
         icon="mdi:weather-rainy",
-        native_unit_of_measurement=PRECIPITATION_MILLIMETERS_PER_HOUR,
+        native_unit_of_measurement=UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR,
         attr="rain_rate",
-        conversion_fn=lambda attr: attr.to(QUANTITY_INCHES_PER_HOUR),
+        conversion_fn=lambda attr: attr.to(UnitOfVolumetricFlux.INCHES_PER_HOUR),
     ),
     WeatherFlowSensorEntityDescription(
         key="relative_humidity",
@@ -264,10 +260,10 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
     WeatherFlowSensorEntityDescription(
         key="station_pressure",
         name="Station Pressure",
-        native_unit_of_measurement=PRESSURE_MBAR,
+        native_unit_of_measurement=UnitOfPressure.MBAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
-        conversion_fn=lambda attr: attr.to(PRESSURE_INHG),
+        conversion_fn=lambda attr: attr.to(UnitOfPressure.INHG),
         decimals=5,
     ),
     WeatherFlowSensorEntityDescription(
@@ -295,10 +291,10 @@ SENSORS: tuple[WeatherFlowSensorEntityDescription, ...] = (
     WeatherFlowSensorEntityDescription(
         key="vapor_pressure",
         name="Vapor Pressure",
-        native_unit_of_measurement=PRESSURE_MBAR,
+        native_unit_of_measurement=UnitOfPressure.MBAR,
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
-        conversion_fn=lambda attr: attr.to(PRESSURE_INHG),
+        conversion_fn=lambda attr: attr.to(UnitOfPressure.INHG),
         decimals=5,
     ),
     WeatherFlowTemperatureSensorEntityDescription(
@@ -352,7 +348,9 @@ async def async_setup_entry(
         """Add WeatherFlow sensor."""
         _LOGGER.debug("Adding sensors for %s", device)
         async_add_entities(
-            WeatherFlowSensorEntity(device, description, hass.config.units.is_metric)
+            WeatherFlowSensorEntity(
+                device, description, hass.config.units is METRIC_SYSTEM
+            )
             for description in SENSORS
             if hasattr(
                 device,
@@ -397,6 +395,8 @@ class WeatherFlowSensorEntity(SensorEntity):
             sw_version=self.device.firmware_revision,
             suggested_area="Backyard",
         )
+        if isinstance(device, WeatherFlowSensorDevice):
+            self._attr_device_info["via_device"] = (DOMAIN, self.device.hub_sn)
         self._attr_name = (
             f"{self.device.model} {self.device.serial_number} {description.name}"
         )
@@ -423,7 +423,7 @@ class WeatherFlowSensorEntity(SensorEntity):
             return attr
 
         if (
-            not self.hass.config.units.is_metric
+            not self.hass.config.units is METRIC_SYSTEM
             and (fn := self.entity_description.conversion_fn) is not None
         ) or (fn := self.entity_description.value_fn) is not None:
             attr = fn(attr)

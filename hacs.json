@@ -1,7 +1,5 @@
 {
   "name": "WeatherFlow - Local",
-  "domains": [
-    "sensor"
-  ],
-  "homeassistant": "2022.3.0"
+  "domains": ["sensor"],
+  "homeassistant": "2022.12.0"
 }
