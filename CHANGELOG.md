@@ -1,5 +1,14 @@
 # List of Changes
 
+## Version 2023.2.0
+
+- Use async_forward_entry_setups instead of async_setup_platforms
+- Resolve HA warnings on device class/units
+
+## Version 2022.12.0
+
+- Fix issues with deprecated HA code
+
 ## Version 2022.7.0
 
 - Bump pyweatherflowudp to 1.4.1 - [Changelog](https://github.com/briis/pyweatherflowudp/blob/main/CHANGELOG.md)
