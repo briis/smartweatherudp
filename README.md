@@ -1,3 +1,11 @@
+# 🚨 DEPRECATED – This Repository is No Longer Maintained
+
+⚠️ **This integration is deprecated and should be removed.** Please use the official Home Assistant integration instead.
+
+🔗 [Home Assistant WeatherFlow integration](https://www.home-assistant.io/integrations/weatherflow)
+
+---
+
 ![Release](https://img.shields.io/github/v/release/briis/smartweatherudp?style=for-the-badge)
 [![Buy Me A Coffee/Beer](https://img.shields.io/badge/Buy_Me_A_☕/🍺-F16061?style=for-the-badge&logo=ko-fi&logoColor=white&labelColor=grey)](https://ko-fi.com/natekspencer)
 [![HACS Badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
